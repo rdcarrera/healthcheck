@@ -1,0 +1,10 @@
+module: httpGetString
+conf:
+  protocol: http
+  port: 80
+  host: www.google.es
+  context: /services/
+  code: 200
+  string:
+    - rs.services.single
+    - canonical
