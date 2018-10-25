@@ -4,10 +4,13 @@ import yaml
 import importlib
 
 class StepData (object):
-    name = ""
-    module = ""
-    file = ""
-    result = ""
+    def __init__(self,module_name, config_name):
+        self.module_name = module_name
+        self.config_name = config_name
+    def result(self):
+        config_file = CONFIG_DIRECTORY+self.config_name+".yml"
+        module = importlib.import_module('modules.'+self.module_name)
+        return module.main(config_file)
 
 CONFIG_DIRECTORY = "./config/"
 HEALTCH_PROCCESS_CONFIG = CONFIG_DIRECTORY+"Healthcheck.yml"
@@ -19,10 +22,8 @@ for _iterator in range(len(config["tasks"])):
     for _iterator2 in range(len(config["tasks"][_iterator]["steps"])):
 
         print "Esta es la informacion de la tarea " + config["tasks"][_iterator]["name"] + " el paso "  + config["tasks"][_iterator]["steps"][_iterator2]["name"] + " con el modulo " + config["tasks"][_iterator]["steps"][_iterator2]["module"]
-        StepData.module_name=config["tasks"][_iterator]["steps"][_iterator2]["module"]
-        StepData.config_name=config["tasks"][_iterator]["steps"][_iterator2]["name"]
-        StepData.config_file=CONFIG_DIRECTORY+StepData.config_name+".yml"
-        StepData.module = importlib.import_module('modules.'+StepData.module_name)
-        StepData.result = StepData.module.main( StepData.config_file )
-        print StepData.result[0]
-        del StepData
+
+        valor = StepData(config["tasks"][_iterator]["steps"][_iterator2]["module"],config["tasks"][_iterator]["steps"][_iterator2]["name"])
+        print valor.result()[0]
+
+        del valor
