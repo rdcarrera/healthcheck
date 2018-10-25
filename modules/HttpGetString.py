@@ -11,9 +11,9 @@
 # Import of the requirenments
 import yaml
 import urllib
-from PortOpen import PortOpen
+from extras.PortOpen import PortOpen
 
-def HttpGetString( config_path = "templates/HttpGetString.yml" ):
+def main ( config_path = "templates/HttpGetString.yml" ):
     # Import of the configuration files
     with open(config_path, 'r') as yaml_stream:
         try:
