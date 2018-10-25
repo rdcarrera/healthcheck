@@ -1,7 +1,8 @@
-module: httpGetString
+---
+module: HttpGetString
 conf:
   protocol: http
-  port: 81
+  port: 80
   host: www.google.es
   context: /services/
   code: 200

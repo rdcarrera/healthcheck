@@ -11,9 +11,9 @@
 # Import of the requirenments
 import yaml
 import urllib
-from portOpen import PortOpen
+from PortOpen import PortOpen
 
-def HttpGetString( config_path = "templates/httpGetString.yml" ):
+def HttpGetString( config_path = "templates/HttpGetString.yml" ):
     # Import of the configuration files
     with open(config_path, 'r') as yaml_stream:
         try:
@@ -24,8 +24,8 @@ def HttpGetString( config_path = "templates/httpGetString.yml" ):
 
     # Verification of the parameters
     if isinstance(httpgetstring["module"], str) is False or  \
-       httpgetstring["module"] != "httpGetString":
-           return("[CRITICAL] - El fichero de configuracio no corresponde con el template",2)
+       httpgetstring["module"] != "HttpGetString":
+           return("[CRITICAL] - El fichero de configuracion no corresponde con el template",2)
 
     if isinstance(httpgetstring["conf"]["host"], str) is False:
         return("[CRITICAL] - No esta correctamente definido la variable host",2)
@@ -43,19 +43,24 @@ def HttpGetString( config_path = "templates/httpGetString.yml" ):
         if isinstance(httpgetstring["conf"]["string"][_iterator], str) is False:
                 return("[CRITICAL] - El string definido no es correcto",2)
 
+    if isinstance(httpgetstring["conf"]["anomaly_exit"], int) is False:
+        exit_code = 1
+    else:
+        exit_code = httpgetstring["conf"]["anomaly_exit"]
+
 
     #Check comunication with the services
     if PortOpen(httpgetstring["conf"]["host"],httpgetstring["conf"]["port"]) != 0:
-        return("[CRITICAL] - Imposible comunicar con %s:%s" % (httpgetstring["conf"]["host"],httpgetstring["conf"]["port"]),2)
+        return("[CRITICAL] - Imposible comunicar con %s:%s" % (httpgetstring["conf"]["host"],httpgetstring["conf"]["port"]),exit_code)
 
     # Capturar la web
     urlParse = ("%s://%s:%i%s" % (httpgetstring["conf"]["protocol"],httpgetstring["conf"]["host"],httpgetstring["conf"]["port"],httpgetstring["conf"]["context"]))
     _dataresponse = urllib.urlopen(urlParse, data=None)
     if _dataresponse.getcode() is not httpgetstring["conf"]["code"]:
-        return("[CRITICAL] - El codigo de respuesta es invalido %i" % (_dataresponse.getcode()),2)
+        return("[CRITICAL] - El codigo de respuesta es invalido %i" % (_dataresponse.getcode()),exit_code)
     vardata = _dataresponse.read()
     for _iterator2 in range(len(httpgetstring["conf"]["string"])):
         if httpgetstring["conf"]["string"][_iterator2] not in vardata:
-            return("[CRITICAL] - No se ha encontrado el string %s en la web solicitada" % (httpgetstring["conf"]["string"][_iterator2]),2)
+            return("[CRITICAL] - No se ha encontrado el string %s en la web solicitada" % (httpgetstring["conf"]["string"][_iterator2]),exit_code)
 
     return("[OK] - Se ha verificado la direccion: %s" % (urlParse),0)

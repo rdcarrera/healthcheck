@@ -1,0 +1,6 @@
+---
+tasks:
+  - name: healthcheck
+    steps:
+      - name: GoogleUrl
+        module: HttpGetString

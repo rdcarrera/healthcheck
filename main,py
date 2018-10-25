@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+import sys
+import yaml
+import importlib
+
+class StepData (object):
+    name = ""
+    module = ""
+    file = ""
+    result = ""
+
+CONFIG_DIRECTORY = "./config/"
+HEALTCH_PROCCESS_CONFIG = CONFIG_DIRECTORY+"Healthcheck.yml"
+
+from modules.HttpGetString import HttpGetString
+
+config_file_load = open(HEALTCH_PROCCESS_CONFIG,'r')
+config = yaml.safe_load(config_file_load)
+
+for _iterator in range(len(config["tasks"])):
+    for _iterator2 in range(len(config["tasks"][_iterator]["steps"])):
+
+        print "Esta es la informacion de la tarea " + config["tasks"][_iterator]["name"] + " el paso "  + config["tasks"][_iterator]["steps"][_iterator2]["name"] + " con el modulo " + config["tasks"][_iterator]["steps"][_iterator2]["module"]
+        StepData.module=config["tasks"][_iterator]["steps"][_iterator2]["module"]
+        StepData.name=config["tasks"][_iterator]["steps"][_iterator2]["name"]
+        StepData.file=CONFIG_DIRECTORY+StepData.name+".yml"
+        StepData.result = eval(StepData.module)( StepData.file )
+        print StepData.result[0]
+        del StepData
