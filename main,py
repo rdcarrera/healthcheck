@@ -2,6 +2,7 @@
 import sys
 import yaml
 import importlib
+import os.path
 
 class StepData (object):
     def __init__(self,module_name, config_name):
@@ -9,6 +10,10 @@ class StepData (object):
         self.config_name = config_name
     def result(self):
         config_file = CONFIG_DIRECTORY+self.config_name+".yml"
+	if os.path.isfile(config_file) is False:
+		return("[CRITICAL] - The config file doesn't exist, please check "+config_file,2)
+        if os.path.isfile("./modules/"+self.module_name+".py") is False:
+                return("[CRITICAL] - The module file doesn't exist, please check ./modules/"+self.module_name+".py",2)
         module = importlib.import_module('modules.'+self.module_name)
         return module.main(config_file)
 
