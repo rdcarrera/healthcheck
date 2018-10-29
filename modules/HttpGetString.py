@@ -11,10 +11,15 @@
 # Import of the requirenments
 import yaml
 import urllib
+import os.path
 from extras.PortOpen import PortOpen
+
 
 def main ( config_path = "templates/HttpGetString.yml" ):
     # Import of the configuration files
+    if os.path.isfile(config_path) is False:
+	return("[CRITICAL] - The config file doesn't exist, please check "+config_path,2)
+
     with open(config_path, 'r') as yaml_stream:
         try:
             httpgetstring = yaml.load(yaml_stream)

@@ -1,11 +1,12 @@
 ---
 module: HttpGetString
 conf:
-  protocol: http
-  port: 80
+  protocol: https
+  port: 443
   host: www.google.es
   context: /services/
   code: 200
+  anomaly_exit: 1
   string:
     - rs.services.single
     - canonical
