@@ -40,12 +40,12 @@ def time_comparation(result_file,external_config):
             seconds_interval = SECONDS_INTERVAL
         else:
             seconds_interval = external_config["seconds_interval"]
-    result_file_load = open(result_file,'r')
-    result_file_data = yaml.safe_load(result_file_load)
-    yaml.load_all
-    next_execution_time = result_file_data["execution_time"]+datetime.timedelta(seconds=seconds_interval)
-    if datetime.datetime.now() < next_execution_time:
-        return False
+        result_file_load = open(result_file,'r')
+        result_file_data = yaml.safe_load(result_file_load)
+        yaml.load_all
+        next_execution_time = result_file_data["execution_time"]+datetime.timedelta(seconds=seconds_interval)
+        if datetime.datetime.now() < next_execution_time:
+            return False
     return True
 
 
