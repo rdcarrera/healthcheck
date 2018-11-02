@@ -7,7 +7,7 @@ LABEL maintener "Ruben D. Carrera <@rdcarrera>"
 LABEL version develop
 
 #Install the python
-RUN apk add --update python curl
+RUN apk add --update python curl py-yaml py-dateutil
 
 #Create the workdir
 RUN mkdir /workdir

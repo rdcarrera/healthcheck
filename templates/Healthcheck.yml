@@ -2,8 +2,11 @@
 config:
   default_seconds_interval: 60
   default_proccess_wait_time: 5
+  default_retry_on_faults: 3
+  default_max_history_data: 2048
   default_history_folder: ./history/
   default_config_folder: ./templates/
+  default_lock_folder: ./lock/
 tasks:
   - name: Healthcheck
     steps:
