@@ -147,7 +147,7 @@ def main(argv):
         else:
             default_max_history_data = config_process["config"]["default_max_history_data"]
 
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ LOAD ] " + health_check_config,'green'))
+        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ LOAD ] - " + health_check_config,'green'))
 
         try: 
             while True:

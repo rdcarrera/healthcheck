@@ -9,30 +9,35 @@ LABEL version develop
 #Install the python
 RUN apk add --update python curl py-yaml py-dateutil py-termcolor
 
-#Create the workdir
-RUN mkdir /workdir
+#Create the healthcheck
+RUN mkdir /healthcheck
 
-#ADD 777 perms to the workdir
-RUN chmod 777 /workdir
+#ADD 777 perms to the healthcheck
+RUN chmod 777 /healthcheck
 
 #ADD work USER
 RUN adduser --system --no-create-home workuser
 
 #Expose the port 8080
-EXPOSE 8080
+#EXPOSE 8080
 
 #User apache user
 USER workuser
 
-#Move to the workdir
-WORKDIR /workdir
+#Move to the healthcheck
+WORKDIR /healthcheck
 
-#COPY index
-COPY ./index.html /workdir/index.html
-
+#COPY EVERYTHING
+COPY ./index.html /healthcheck/index.html
+COPY ./main.py /healthcheck/main.py
+COPY ./modules/ /healthcheck/modules/
+COPY ./templates/ /healthcheck/templates/
 #Healthceck verification
-HEALTHCHECK --interval=5m --timeout=3s \
- CMD curl -f http://localhost:8080/ || exit 1
+#HEALTHCHECK --interval=5m --timeout=3s \
+# CMD curl -f http://localhost:8080/ || exit 1
+
+#ENV with the path of the config
+ENV CONFIG_PATH /healthcheck/templates/Healthcheck.yml
 
 #Execute the apache2
-CMD ["/usr/bin/python", "-m" , "SimpleHTTPServer",  "8080"]
+CMD /healthcheck/main.py -c  $CONFIG_PATH
