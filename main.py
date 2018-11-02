@@ -1,9 +1,17 @@
 #!/usr/bin/env python
-import sys, yaml, importlib, getopt, datetime, threading, os
+import sys 
+import yaml 
+import importlib
+import getopt
+import datetime
+import threading
+import os
+from time import sleep
 from dateutil import parser 
 
 CONFIG_DIRECTORY = "./config/"
 HISTORY_DIRECTORY = "./history/"
+WAIT_TIME_BETWEEN_ITERATIONS = 5
 SECONDS_INTERVAL = 300
 
 class StepData (object):
@@ -24,13 +32,28 @@ class StepData (object):
             [ 
                 self.result_info[0],
                 self.result_info[1] 
-            ] 
+            ],
+            'history_changed_status': self.history_changed_status
             }
+    def calculate_history_data(self):
+        if os.path.isfile(self.result_file):
+            _result_file_load = open(self.result_file,'r')
+            _result_file_data = yaml.safe_load(_result_file_load)
+            _history_changed_status = _result_file_data["history_changed_status"] 
+            if int(_history_changed_status[0].strip().split()[0]) is not self.result_info[1]:
+                _state_changed_data = str(self.result_info[1]) + " ||| " + str(self.execution_time) + " ||| " + self.result_info[0] 
+                _history_changed_status.insert(0,_state_changed_data)
+        else:
+            _history_changed_status  = [ str(self.result_info[1]) + " ||| " + str(self.execution_time) + " ||| " + self.result_info[0] ]
+        return _history_changed_status
+
     def __init__(self,module_name, config_name, result_file):
         self.module_name = module_name
         self.config_name = config_name
+        self.result_file = result_file
         self.result_info = self.run()
         self.execution_time = datetime.datetime.now()
+        self.history_changed_status = self.calculate_history_data()
         with open(result_file, 'w') as _outfile:
             yaml.dump(self.returninfo(), _outfile, default_flow_style=False)
         
@@ -42,13 +65,12 @@ def time_comparation(result_file,external_config):
             seconds_interval = external_config["seconds_interval"]
         result_file_load = open(result_file,'r')
         result_file_data = yaml.safe_load(result_file_load)
-        yaml.load_all
         next_execution_time = result_file_data["execution_time"]+datetime.timedelta(seconds=seconds_interval)
         if datetime.datetime.now() < next_execution_time:
             return False
     return True
 
-
+ 
 def main(argv):
     health_check_config = ''
     try:
@@ -85,4 +107,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    print "The proccess is executing..."
+    try:
+        while True:
+            main(sys.argv[1:])
+            sleep(WAIT_TIME_BETWEEN_ITERATIONS)
+    except KeyboardInterrupt:
+        print "The user stopped the proccess"
+        sys.exit(0)
