@@ -9,16 +9,11 @@ import os
 from time import sleep
 from dateutil import parser 
 
-CONFIG_DIRECTORY = "./config/"
-HISTORY_DIRECTORY = "./history/"
-WAIT_TIME_BETWEEN_ITERATIONS = 5
-SECONDS_INTERVAL = 300
-
 class StepData (object):
     def run(self):
-        config_file = CONFIG_DIRECTORY+self.config_name+".yml"
-    	if os.path.isfile(config_file) is False:
-    		return("[CRITICAL] - The config file doesn't exist, please check "+config_file,2)
+        config_file = default_config_folder+self.config_name+".yml"
+        if os.path.isfile(config_file) is False:
+            return("[CRITICAL] - The config file doesn't exist, please check "+config_file,2)
         if os.path.isfile("./modules/"+self.module_name+".py") is False:
             return("[CRITICAL] - The module file doesn't exist, please check ./modules/"+self.module_name+".py",2)
         module = importlib.import_module('modules.'+self.module_name)
@@ -48,6 +43,7 @@ class StepData (object):
         return _history_changed_status
 
     def __init__(self,module_name, config_name, result_file):
+        print("[ " + str(datetime.datetime.now()) + " ] - [START] - [ " + str(threading.current_thread().name) + " ] - Executing test " + config_name + " in background...")
         self.module_name = module_name
         self.config_name = config_name
         self.result_file = result_file
@@ -56,11 +52,13 @@ class StepData (object):
         self.history_changed_status = self.calculate_history_data()
         with open(result_file, 'w') as _outfile:
             yaml.dump(self.returninfo(), _outfile, default_flow_style=False)
+        print("[ " + str(datetime.datetime.now()) + " ] -  [END]  - [ "+str(threading.current_thread().name)+" ] - Executing test " + config_name + " in background...")
+        return None
         
 def time_comparation(result_file,external_config):
     if os.path.isfile(result_file):
         if "seconds_interval" not in external_config:
-            seconds_interval = SECONDS_INTERVAL
+            seconds_interval = default_seconds_interval
         else:
             seconds_interval = external_config["seconds_interval"]
         result_file_load = open(result_file,'r')
@@ -76,42 +74,74 @@ def main(argv):
     try:
         opts, _args = getopt.getopt(argv,"c:",["config="])
     except getopt.GetoptError:
-        print 'main.py -c <config>'
+        print("main.py -c <config>")
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-c", "--config"):
             health_check_config = arg
     if health_check_config == "":
-        health_check_config = CONFIG_DIRECTORY+"Healthcheck.yml"
+        health_check_config = "./templates/Healthcheck.yml"
     if os.path.isfile(health_check_config) is False:
-        print "[CRITICAL] - The config of the health check proccess doesn't exist, please check "+health_check_config
+        print("[ " + str(datetime.datetime.now()) + " ] -[CRITICAL] - The config of the health check proccess doesn't exist, please check "+health_check_config)
         sys.exit(2)
-    if not os.path.exists(HISTORY_DIRECTORY):
-        os.makedirs(HISTORY_DIRECTORY)
 
-    config_file_load = open(health_check_config,'r')
-    config = yaml.safe_load(config_file_load)
+    config_process_load = open(health_check_config,'r')
+    config_process = yaml.safe_load(config_process_load)
 
     try:
-        for _iterator in range(len(config["tasks"])):
-            for _iterator2 in range(len(config["tasks"][_iterator]["steps"])):
-                result_file = HISTORY_DIRECTORY+config["tasks"][_iterator]["steps"][_iterator2]["name"]+".yml"
-                if time_comparation(result_file,config["tasks"][_iterator]["steps"][_iterator2]) is False:
-                    continue
+        global default_seconds_interval
+        if "default_seconds_interval" not in config_process["config"]:
+            default_seconds_interval = 60
+        else:
+            default_seconds_interval = config_process["config"]["default_seconds_interval"]
 
-                threading.Thread(target=StepData, args=(config["tasks"][_iterator]["steps"][_iterator2]["module"],config["tasks"][_iterator]["steps"][_iterator2]["name"],result_file)).start()
+        if "default_proccess_wait_time" not in config_process["config"]:
+            default_proccess_wait_time = 5
+        else:
+            default_proccess_wait_time = config_process["config"]["default_proccess_wait_time"]
+
+        if "default_history_folder" not in config_process["config"]:
+            default_history_folder = "./history/"
+        else:
+            default_history_folder = config_process["config"]["default_history_folder"]
+        
+        if not os.path.exists(default_history_folder):
+            os.makedirs(default_history_folder)
+
+        global default_config_folder
+        if "default_config_folder" not in config_process["config"]:
+            default_config_folder = "./templates/"
+        else:
+            default_config_folder = config_process["config"]["default_config_folder"]
+
+        print("[ " + str(datetime.datetime.now()) + " ] - Loaded config file " + health_check_config + " the process is going to start...")
+
+        try: 
+            while True:
+                for _iterator in range(len(config_process["tasks"])):
+
+                    for _iterator2 in range(len(config_process["tasks"][_iterator]["steps"])):
+                
+                        result_file = default_history_folder+config_process["tasks"][_iterator]["steps"][_iterator2]["name"]+".yml"
+                        if time_comparation(result_file,config_process["tasks"][_iterator]["steps"][_iterator2]) is False:
+                            continue
+                
+                        threading.Thread(target=StepData, args=(config_process["tasks"][_iterator]["steps"][_iterator2]["module"],config_process["tasks"][_iterator]["steps"][_iterator2]["name"],result_file)).start()
+                
+                sleep(default_proccess_wait_time)
+        except KeyboardInterrupt:
+            print("[ " + str(datetime.datetime.now()) + " ] - [ STOPPING ] - The user stopped the proccess")
+            sys.exit(0)
+        except:
+            print("[ " + str(datetime.datetime.now()) + " ] - Undefined error.")
+            sys.exit(0)
 
     except (KeyError,TypeError) as _error:
-        print "[CRITICAL] - The config file "+health_check_config+" is invalid"
+        print("[ " + str(datetime.datetime.now()) + " ] - [CRITICAL] - The config file "+health_check_config+" is invalid")
         sys.exit(2)
 
 
 if __name__ == "__main__":
-    print "The proccess is executing..."
-    try:
-        while True:
-            main(sys.argv[1:])
-            sleep(WAIT_TIME_BETWEEN_ITERATIONS)
-    except KeyboardInterrupt:
-        print "The user stopped the proccess"
-        sys.exit(0)
+    print("[ " + str(datetime.datetime.now()) + " ] - [STARTING] - The process is starting")
+    main(sys.argv[1:])
+            

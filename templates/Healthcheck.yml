@@ -1,6 +1,12 @@
 ---
+config:
+  default_seconds_interval: 60
+  default_proccess_wait_time: 5
+  default_history_folder: ./history/
+  default_config_folder: ./templates/
 tasks:
-  - name: healthcheck
+  - name: Healthcheck
     steps:
       - name: GoogleUrl
         module: HttpGetString
+        seconds_interval: 10
