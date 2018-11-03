@@ -28,7 +28,7 @@ USER workuser
 WORKDIR /healthcheck
 
 #COPY EVERYTHING
-COPY ./index.html /healthcheck/index.html
+#COPY ./index.html /healthcheck/index.html
 COPY ./healthcheck /healthcheck/healthcheck
 COPY ./modules/ /healthcheck/modules/
 COPY ./templates/ /healthcheck/templates/
