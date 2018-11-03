@@ -2,5 +2,8 @@
 *.pyc
 /history/
 /config/
+/lock/
 test*
 .vscode
+__pycache__
+index.html

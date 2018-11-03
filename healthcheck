@@ -140,6 +140,14 @@ def main(argv):
             default_lock_folder = config_process["config"]["default_lock_folder"]
         if not os.path.exists(default_lock_folder):
             os.makedirs(default_lock_folder)
+        for files_to_remove in os.listdir(default_lock_folder):
+            file_lock_path = os.path.join(default_lock_folder, files_to_remove)
+            try:
+                if os.path.isfile(file_lock_path):
+                    os.unlink(file_lock_path)
+            except Exception as e:
+                print(e)
+
 
         global default_max_history_data
         if "default_max_history_data" not in config_process["config"]:
@@ -151,28 +159,31 @@ def main(argv):
 
         try: 
             while True:
-                for _iterator in range(len(config_process["tasks"])):
 
-                    for _iterator2 in range(len(config_process["tasks"][_iterator]["steps"])):
-                
-                        result_file = default_history_folder+config_process["tasks"][_iterator]["steps"][_iterator2]["name"]+".yml"
-                        if time_comparation(result_file,config_process["tasks"][_iterator]["steps"][_iterator2]) is False:
-                            continue
-                        lockfile = default_lock_folder+config_process["tasks"][_iterator]["steps"][_iterator2]["name"]+".lck"
-                        if os.path.isfile(lockfile) is False:
-                            threading.Thread(target=StepData, args=(config_process["tasks"][_iterator]["steps"][_iterator2]["module"],config_process["tasks"][_iterator]["steps"][_iterator2]["name"],result_file,lockfile)).start()
+                for _iterator in range(len(config_process["tasks"])):
+            
+                    result_file = default_history_folder+config_process["tasks"][_iterator]["name"]+".yml"
+                    if time_comparation(result_file,config_process["tasks"][_iterator]) is False:
+                        continue
+                    lockfile = default_lock_folder+config_process["tasks"][_iterator]["name"]+".lck"
+                    if os.path.isfile(lockfile) is False:
+                        threading.Thread(target=StepData, args=(config_process["tasks"][_iterator]["module"],config_process["tasks"][_iterator]["name"],result_file,lockfile)).start()
                 
                 sleep(default_proccess_wait_time)
         except KeyboardInterrupt:
             print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ STOPPING ] - The user has stopped the proccess",'yellow'))
             sys.exit(0)
         except:
-            print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error.",'grey'))
-            sys.exit(0)
+            print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
+            sys.exit(3)
 
     except (KeyError,TypeError) as _error:
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config file "+health_check_config+" is invalid",'red'))
+        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config file isn't valid: "+health_check_config,'red'))
         sys.exit(2)
+    except:
+        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
+        sys.exit(3)
+
 
 if __name__ == "__main__":
     print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [STARTING] - The process is starting",'green'))

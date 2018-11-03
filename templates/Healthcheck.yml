@@ -8,8 +8,6 @@ config:
   default_config_folder: ./templates/
   default_lock_folder: ./lock/
 tasks:
-  - name: Healthcheck
-    steps:
-      - name: GoogleUrl
-        module: HttpGetString
-        seconds_interval: 10
+  - name: GoogleUrl
+    module: HttpGetString
+    seconds_interval: 10

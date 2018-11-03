@@ -29,7 +29,7 @@ WORKDIR /healthcheck
 
 #COPY EVERYTHING
 COPY ./index.html /healthcheck/index.html
-COPY ./main.py /healthcheck/main.py
+COPY ./healthcheck /healthcheck/healthcheck
 COPY ./modules/ /healthcheck/modules/
 COPY ./templates/ /healthcheck/templates/
 #Healthceck verification
@@ -40,4 +40,4 @@ COPY ./templates/ /healthcheck/templates/
 ENV CONFIG_PATH /healthcheck/templates/Healthcheck.yml
 
 #Execute the apache2
-CMD /healthcheck/main.py -c  $CONFIG_PATH
+CMD /healthcheck/healthcheck -c  $CONFIG_PATH
