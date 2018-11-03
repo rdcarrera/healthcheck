@@ -18,7 +18,6 @@
               <td>4. Connected to dockerhub an created the containers</td>
             </tr>
         </tr>
-
         <tr>
             <td rowspan=2><b>0.0.1b</b></td>
             <td rowspan=2><b>@rdcarrera</b><br>2018-09-23</td>
