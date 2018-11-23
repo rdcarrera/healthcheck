@@ -4,6 +4,14 @@
         <tr>
             <th colspan=3><b>VERSIONS</b></th>
         </tr>
+         <tr>
+            <td rowspan=2><b>0.2</b></td>
+            <td rowspan=2><b>@rdcarrera</b><br>2018-11-23</td>
+            <td>1. Adapted to work with python3.</td>
+            <tr>
+              <td>2. Changed the python env of the docker image to python 3.</td>
+            </tr>
+        </tr>
         <tr>
             <td rowspan=4><b>0.1</b></td>
             <td rowspan=4><b>@rdcarrera</b><br>2018-11-03</td>

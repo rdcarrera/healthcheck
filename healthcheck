@@ -188,4 +188,3 @@ def main(argv):
 if __name__ == "__main__":
     print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [STARTING] - The process is starting",'green'))
     main(sys.argv[1:])
-            

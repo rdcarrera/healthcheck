@@ -7,7 +7,7 @@ LABEL maintener "Ruben D. Carrera <@rdcarrera>"
 LABEL version develop
 
 #Install the python
-RUN apk add --update python curl py-yaml py-dateutil py-termcolor
+RUN apk add --update python3 curl py3-yaml py3-dateutil py3-termcolor
 
 #Create the healthcheck
 RUN mkdir /healthcheck
@@ -17,6 +17,9 @@ RUN chmod 777 /healthcheck
 
 #ADD work USER
 RUN adduser --system --no-create-home workuser
+
+#LINK PYTHON3 AS PYTHON
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 #Expose the port 8080
 #EXPOSE 8080

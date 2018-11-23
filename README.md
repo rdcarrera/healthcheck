@@ -112,7 +112,7 @@ The time to wait in seconds between iteration to check this task
 
 
 ## VERSION History [<img src="https://image.flaticon.com/icons/svg/23/23714.svg" alt="drawing" width="20"/>](#table)
-[VERSION History](https://github.com/rdcarrera/hhealthcheck/blob/master/VERSION.md)
+[VERSION History](https://github.com/rdcarrera/healthcheck/blob/develop/VERSION.md)
 
 ## Author [<img src="https://image.flaticon.com/icons/svg/23/23714.svg" alt="drawing" width="20"/>](#table)
 [<img src="https://avatars0.githubusercontent.com/u/26046280?s=460&v=4"/>](https://github.com/rdcarrera)
