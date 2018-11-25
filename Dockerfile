@@ -12,6 +12,9 @@ RUN apk add --update python3
 #Update pip
 RUN python3 -m pip install --upgrade pip
 
+#Install pipenv
+RUN python3 -m pip install pipenv
+
 #Create the healthcheck
 RUN mkdir /healthcheck
 
@@ -30,11 +33,8 @@ USER workuser
 #Move to the healthcheck
 WORKDIR /healthcheck
 
-#Install pipenv
-RUN python3 -m pip install pipenv --user
-
 #Install the dependency of the env
-RUN python3 -m pipenv install termcolor PyYAML python-dateutil 
+RUN python3 -m pipenv install termcolor PyYAML python-dateutil
 
 #COPY EVERYTHING
 #COPY ./index.html /healthcheck/index.html
