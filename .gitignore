@@ -7,3 +7,4 @@ test*
 .vscode
 __pycache__
 index.html
+Pipfile*

@@ -5,6 +5,14 @@
             <th colspan=3><b>VERSIONS</b></th>
         </tr>
          <tr>
+            <td rowspan=2><b>0.2.1</b></td>
+            <td rowspan=2><b>@rdcarrera</b><br>2018-11-25</td>
+            <td>1. Changed the dependency to pipenv.</td>
+            <tr>
+              <td>2. Added the dependency of pipenv on the docker img.</td>
+            </tr>
+        </tr>
+         <tr>
             <td rowspan=2><b>0.2</b></td>
             <td rowspan=2><b>@rdcarrera</b><br>2018-11-23</td>
             <td>1. Adapted to work with python3.</td>

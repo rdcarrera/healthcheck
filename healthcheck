@@ -87,7 +87,7 @@ def main(argv):
     try:
         opts, _args = getopt.getopt(argv,"c:",["config="])
     except getopt.GetoptError:
-        print(colored("main.py -c <config>",'red'))
+        print(colored("healthcheck -c <config>",'red'))
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-c", "--config"):
