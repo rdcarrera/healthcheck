@@ -40,14 +40,14 @@ RUN python3 -m pipenv install termcolor PyYAML python-dateutil
 #COPY ./index.html /healthcheck/index.html
 COPY ./healthcheck /healthcheck/healthcheck
 COPY ./modules/ /healthcheck/modules/
-COPY ./templates/ /healthcheck/templates/
+COPY ./examples/ /healthcheck/examples/
 
 #Healthceck verification
 #HEALTHCHECK --interval=5m --timeout=3s \
 # CMD curl -f http://localhost:8080/ || exit 1
 
 #ENV with the path of the config
-ENV CONFIG_PATH /healthcheck/templates/Healthcheck.yml
+ENV CONFIG_PATH /healthcheck/examples/Healthcheck.yml
 
 #Execute the apache2
 CMD python3 -m pipenv run python /healthcheck/healthcheck -c  $CONFIG_PATH
