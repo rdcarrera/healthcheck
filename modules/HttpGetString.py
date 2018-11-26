@@ -1,25 +1,38 @@
-# Module: httpGetString
+# Module: HttpGetString
 # Author: rdcarrera
-# Version: 0.1
+# Version: 0.2
 # Require:
-#       Extras - portOpen
-#       Config - template httpGetString
+#       Extras - PortOpen, CheckConfig
+#       Config - template HttpGetString
 # Check petition to a http server and validate a string
-
-#def httpGetString()
 
 # Import of the requirenments
 import yaml
 import os.path
 import modules.extras.PortOpen as PortOpen
+import modules.extras.CheckConfig as CheckConfig
 import platform
 if int(platform.python_version_tuple()[0]) < 3:
     import urllib
 else: 
     import urllib.request as urllib
 
-
 def main ( config_path = "templates/HttpGetString.yml" ):
+    #default config template
+    config_template = {
+        "module": "str",
+        "conf": {
+            "anomaly_exit": 0
+        },
+        "http_conf": {
+            "protocol": "str",
+            "port": 0,
+            "host": "str",
+            "context": "str",
+            "code": 0
+        }
+    }
+
     # Import of the configuration files
     if os.path.isfile(config_path) is False:
         return("[CRITICAL] - The config file doesn't exist, please check "+config_path,2)
@@ -29,28 +42,18 @@ def main ( config_path = "templates/HttpGetString.yml" ):
             httpgetstring = yaml.load(yaml_stream)
         except yaml.YAMLError as exc:
             print(exc)
+    
+    #Verifiy the configuration
+    return_check_config = CheckConfig.main(config_template,httpgetstring,config_path)
+    if return_check_config is not None:
+      return return_check_config
 
-    # Verification of the parameters
-    if isinstance(httpgetstring["module"], str) is False or  \
-       httpgetstring["module"] != "HttpGetString":
+
+    #Confirm the module name
+    if httpgetstring["module"] != "HttpGetString":
            return("[CRITICAL] - The config file doesn't correspont with the module, please check "+config_path,2)
 
-    if isinstance(httpgetstring["conf"]["host"], str) is False:
-        return("[CRITICAL] - The defined host value isn't valid, please check "+config_path,2)
-
-    if isinstance(httpgetstring["conf"]["port"], int) is False:
-        return("[CRITICAL] - The defined port value isn't valid, please check "+config_path,2)
-
-    if len(httpgetstring["conf"]["string"]) is 0:
-        return("[CRITICAL] - You doesn't define any string in the config, please check "+config_path,2)
-
-    if isinstance(httpgetstring["conf"]["code"], int) is False:
-        return("[CRITICAL] - The defined response code is incorrect, please check "+config_path,2)
-
-    for _iterator in range(len(httpgetstring["conf"]["string"])):
-        if isinstance(httpgetstring["conf"]["string"][_iterator], str) is False:
-                return("[CRITICAL] - The defined strings aren't correct, please check "+config_path,2)
-
+    #Set the exit values
     if isinstance(httpgetstring["conf"]["anomaly_exit"], int) is False:
         exit_code = 1
         exit_value="WARNING"
@@ -66,17 +69,25 @@ def main ( config_path = "templates/HttpGetString.yml" ):
             exit_value="UNKNOWN"
 
     #Check comunication with the services
-    if PortOpen.main(httpgetstring["conf"]["host"],httpgetstring["conf"]["port"]) != 0:
-        return("["+exit_value+"] - Host unreachable %s:%s" % (httpgetstring["conf"]["host"],httpgetstring["conf"]["port"]),exit_code)
+    if PortOpen.main(httpgetstring["http_conf"]["host"],httpgetstring["http_conf"]["port"]) != 0:
+        return("["+exit_value+"] - Host unreachable %s:%s" % (httpgetstring["http_conf"]["host"],httpgetstring["http_conf"]["port"]),exit_code)
 
-    # Capturar la web
-    urlParse = ("%s://%s:%i%s" % (httpgetstring["conf"]["protocol"],httpgetstring["conf"]["host"],httpgetstring["conf"]["port"],httpgetstring["conf"]["context"]))
+    #Get the website
+    urlParse = ("%s://%s:%i%s" % (httpgetstring["http_conf"]["protocol"],httpgetstring["http_conf"]["host"],httpgetstring["http_conf"]["port"],httpgetstring["http_conf"]["context"]))
     _dataresponse = urllib.urlopen(urlParse, data=None)
-    if _dataresponse.getcode() is not httpgetstring["conf"]["code"]:
+    if _dataresponse.getcode() is not httpgetstring["http_conf"]["code"]:
         return("["+exit_value+"] - The response code isn't valid: %i" % (_dataresponse.getcode()),exit_code)
-    vardata = _dataresponse.read()
-    for _iterator2 in range(len(httpgetstring["conf"]["string"])):
-        if httpgetstring["conf"]["string"][_iterator2].encode() not in vardata:
-            return("["+exit_value+"] - The defined string %s wasn't found in the website %s" % (httpgetstring["conf"]["string"][_iterator2],urlParse),exit_code)
+    
+    #Verify the strings
+    if "http_string" in httpgetstring:
+        for _iterator in range(len(httpgetstring["http_string"])):
+            if isinstance(httpgetstring["http_string"][_iterator], str) is False:
+                return("[CRITICAL] - The defined strings aren't correct, please check "+config_path,2)
 
+        vardata = _dataresponse.read()
+        for _iterator2 in range(len(httpgetstring["http_string"])):
+            if httpgetstring["http_string"][_iterator2].encode() not in vardata:
+                return("["+exit_value+"] - The defined string %s wasn't found in the website %s" % (httpgetstring["http_string"][_iterator2],urlParse),exit_code)
+
+    #The correct exit
     return("[OK] - The website: %s was verified" % (urlParse),0)

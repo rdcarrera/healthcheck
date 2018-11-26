@@ -8,6 +8,9 @@ config:
   default_config_folder: ./templates/
   default_lock_folder: ./lock/
 tasks:
-  - name: GoogleUrl
+  - name: HttpGetString
     module: HttpGetString
     seconds_interval: 10
+#  - name: MysqlSelect
+#    module: MysqlSelect
+#    seconds_interval: 10

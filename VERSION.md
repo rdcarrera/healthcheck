@@ -4,6 +4,17 @@
         <tr>
             <th colspan=3><b>VERSIONS</b></th>
         </tr>
+          <tr>
+            <td rowspan=3><b>0.3</b></td>
+            <td rowspan=3><b>@rdcarrera</b><br>2018-11-26</td>
+            <td>1. Added a new module: Mysql Select.</td>
+            <tr>
+              <td>2. Created a new extra module Check config, to define a default template over the module.</td>
+            </tr>
+            <tr>
+              <td>3. Evoluted the HttpGetString to work with the new check config module.</td>
+            </tr>
+        </tr>
          <tr>
             <td rowspan=2><b>0.2.1</b></td>
             <td rowspan=2><b>@rdcarrera</b><br>2018-11-25</td>

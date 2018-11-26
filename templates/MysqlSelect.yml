@@ -1,0 +1,14 @@
+---
+module: "MysqlSelect"
+conf:
+  anomaly_exit: 2
+mysql_conf:
+  port: 3306
+  host: "localhost"
+  database: "test"
+  user: "root"
+  password: "mypassword"
+  raise_on_warnings: True
+mysql_table:
+  table: "Persons"
+  conditional: "WHERE TRUE"

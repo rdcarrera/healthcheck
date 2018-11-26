@@ -1,0 +1,13 @@
+---
+module: "HttpGetString"
+conf:
+  anomaly_exit: 1
+http_conf:
+  protocol: "https"
+  port: 443
+  host: "www.google.es"
+  context: "/services/"
+  code: 200
+http_string:
+    - "rs.services.single"
+    - "canonical"
