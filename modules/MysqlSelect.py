@@ -13,22 +13,11 @@ import modules.extras.PortOpen as PortOpen
 import modules.extras.CheckConfig as CheckConfig
 import platform
 import mysql.connector
+# Import the config model from the template
+from modules.templates.MysqlSelect import config_template_require
 
 
-def main ( config_path = "templates/MysqlSelect.yml" ):
-    #default config template
-    config_template = {
-        "module": "str",
-        "mysql_conf": {
-            "port": 0,
-            "host": "str",
-            "database": "str",
-            "user": "str",
-            "password": "str",
-            "raise_on_warnings": True
-        }
-    }
-
+def main ( config_path = "examples/LocalMysql.yml" ):
     # Import of the configuration files
     if os.path.isfile(config_path) is False:
         return("[CRITICAL] - The config file doesn't exist, please check "+config_path,2)
@@ -40,7 +29,7 @@ def main ( config_path = "templates/MysqlSelect.yml" ):
             print(exc)
 
     #Verifiy the configuration
-    return_check_config = CheckConfig.main(config_template,mysqlSelect,config_path)
+    return_check_config = CheckConfig.main(config_template_require,mysqlSelect,config_path)
     if return_check_config is not None:
       return return_check_config
 

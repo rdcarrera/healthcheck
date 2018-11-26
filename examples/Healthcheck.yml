@@ -5,12 +5,12 @@ config:
   default_retry_on_faults: 3
   default_max_history_data: 2048
   default_history_folder: ./history/
-  default_config_folder: ./templates/
+  default_config_folder: ./examples/
   default_lock_folder: ./lock/
 tasks:
-  - name: HttpGetString
+  - name: GoogleUrl
     module: HttpGetString
     seconds_interval: 10
-#  - name: MysqlSelect
+#  - name: LocalMysql
 #    module: MysqlSelect
 #    seconds_interval: 10

@@ -1,4 +1,3 @@
-import six
 def main (_config_template,_config_module,config_path):
     for key_name in _config_template.keys():
         if key_name not in _config_module:

@@ -16,23 +16,11 @@ if int(platform.python_version_tuple()[0]) < 3:
     import urllib
 else: 
     import urllib.request as urllib
+# Import the config model from the template
+from modules.templates.HttpGetString import config_template_require
 
-def main ( config_path = "templates/HttpGetString.yml" ):
-    #default config template
-    config_template = {
-        "module": "str",
-        "conf": {
-            "anomaly_exit": 0
-        },
-        "http_conf": {
-            "protocol": "str",
-            "port": 0,
-            "host": "str",
-            "context": "str",
-            "code": 0
-        }
-    }
 
+def main ( config_path = "examples/GoogleUrl.yml" ):
     # Import of the configuration files
     if os.path.isfile(config_path) is False:
         return("[CRITICAL] - The config file doesn't exist, please check "+config_path,2)
@@ -44,7 +32,7 @@ def main ( config_path = "templates/HttpGetString.yml" ):
             print(exc)
     
     #Verifiy the configuration
-    return_check_config = CheckConfig.main(config_template,httpgetstring,config_path)
+    return_check_config = CheckConfig.main(config_template_require,httpgetstring,config_path)
     if return_check_config is not None:
       return return_check_config
 
