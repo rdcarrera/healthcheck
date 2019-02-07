@@ -1,6 +1,7 @@
 # HEALTHCHECK
 #
 # VERSION: develop
+# Test
 
 FROM alpine:latest
 LABEL maintener "Ruben D. Carrera <@rdcarrera>"
