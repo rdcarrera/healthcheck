@@ -12,8 +12,7 @@ from dateutil import parser
 
 class StepData (object):
     def __init__(self,module_name, config_name, result_file,lockfile):
-        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [START] - [ " + str(threading.current_thread().name) + " ] - [ " + config_name + " ]",'green'))
-        PrintMesg.main('START',config_name,'green',str(threading.current_thread().name))
+        PrintMesg.main('START',config_name,'white',str(threading.current_thread().name))
         self.module_name = module_name
         self.config_name = config_name
         self.result_file = result_file
@@ -23,8 +22,11 @@ class StepData (object):
         self.history_changed_status = self.calculate_history_data()
         with open(result_file, 'w') as _outfile:
             yaml.dump(self.returninfo(), _outfile, default_flow_style=False)
-        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" -  [END]  - [ "+str(threading.current_thread().name)+" ] - [ " + config_name + " ]",'magenta'))
-        PrintMesg.main('END',config_name,'yellow',str(threading.current_thread().name))
+        if self.result_info[1] is 0:
+            PrintMesg.main('END',config_name,'green',str(threading.current_thread().name))
+        else:
+            PrintMesg.main('FAIL',config_name+' : '+self.result_info[0],'red',str(threading.current_thread().name))
+        
         return None
 
     def run(self):
@@ -89,7 +91,6 @@ def main(argv):
     try:
         opts, _args = getopt.getopt(argv,"c:",["config="])
     except getopt.GetoptError:
-        #print(colored("healthcheck -c <config>",'red'))
         PrintMesg.main('HELP','healthcheck -c <config>','red')
         sys.exit(2)
     for opt, arg in opts:
@@ -98,7 +99,6 @@ def main(argv):
     if health_check_config == "":
         health_check_config = "./examples/Healthcheck.yml"
     if os.path.isfile(health_check_config) is False:
-        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config of the health check proccess doesn't exist, please check "+health_check_config,'red'))
         PrintMesg.main('CRITICAL',"The config of the health check proccess doesn't exist, please check "+health_check_config,'red')
         sys.exit(2)
 
@@ -158,7 +158,6 @@ def main(argv):
         else:
             default_max_history_data = config_process["config"]["default_max_history_data"]
 
-        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ LOAD ] - " + health_check_config,'green'))
         PrintMesg.main('LOAD',health_check_config)
 
         try: 
@@ -175,25 +174,20 @@ def main(argv):
                 
                 sleep(default_proccess_wait_time)
         except KeyboardInterrupt:
-            # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ STOPPING ] - The user has stopped the proccess",'yellow'))
             PrintMesg.main('STOPPING','The user has stopped the proccess','yellow')
             sys.exit(0)
         except:
-            # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
             PrintMesg.main('UNKNOWN','Undefined error','grey')
             sys.exit(3)
 
     except (KeyError,TypeError) as _error:
-        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config file isn't valid: "+health_check_config,'red'))
         PrintMesg.main('CRITICAL',"The config file isn't valid: "+health_check_config,'red')
         sys.exit(2)
     except:
-        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
         PrintMesg.main('UNKNOWN','Undefined error','grey')
         sys.exit(3)
 
 
 if __name__ == "__main__":
-    # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [STARTING] - The process is starting",'green'))
     PrintMesg.main('STARTED','The process is started')
     main(sys.argv[1:])

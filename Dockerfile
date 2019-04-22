@@ -6,16 +6,19 @@ version "develop"
 
 
 #ENV with the path of the config
-ENV DOCKER_CONFIG="/healthcheck/examples/Healthcheck.yml" \
-DOCKER_PATH="/healthcheck" \
+ENV DOCKER_PATH="/healthcheck" \
 DOCKER_USER="workuser" \
-DOCKER_PORT="8080"
+DOCKER_PORT="8080" \
+PS1="[HEALTHCHECK] - \w \$ " \
+TZ=Europe/Madrid
+
+ENV DOCKER_CONFIG="${DOCKER_PATH}/examples/Healthcheck.yml"
 
 #COPY Everything
 COPY ./docker-entrypoint.sh /usr/bin/
-COPY ./healthcheck /healthcheck/healthcheck
-COPY ./modules/ /healthcheck/modules/
-COPY ./examples/ /healthcheck/examples/
+COPY ./healthcheck ${DOCKER_PATH}/healthcheck
+COPY ./modules/ ${DOCKER_PATH}/modules/
+COPY ./examples/ ${DOCKER_PATH}/examples/
 
 #Install the python
 RUN apk add --update python3 && \
