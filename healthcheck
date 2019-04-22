@@ -6,13 +6,14 @@ import getopt
 import datetime
 import threading
 import os
+import modules.extras.PrintMesg as PrintMesg
 from time import sleep
 from dateutil import parser 
-from termcolor import colored
 
 class StepData (object):
     def __init__(self,module_name, config_name, result_file,lockfile):
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [START] - [ " + str(threading.current_thread().name) + " ] - [ " + config_name + " ]",'green'))
+        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [START] - [ " + str(threading.current_thread().name) + " ] - [ " + config_name + " ]",'green'))
+        PrintMesg.main('START',config_name,'green',str(threading.current_thread().name))
         self.module_name = module_name
         self.config_name = config_name
         self.result_file = result_file
@@ -22,7 +23,8 @@ class StepData (object):
         self.history_changed_status = self.calculate_history_data()
         with open(result_file, 'w') as _outfile:
             yaml.dump(self.returninfo(), _outfile, default_flow_style=False)
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" -  [END]  - [ "+str(threading.current_thread().name)+" ] - [ " + config_name + " ]",'magenta'))
+        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" -  [END]  - [ "+str(threading.current_thread().name)+" ] - [ " + config_name + " ]",'magenta'))
+        PrintMesg.main('END',config_name,'yellow',str(threading.current_thread().name))
         return None
 
     def run(self):
@@ -87,7 +89,8 @@ def main(argv):
     try:
         opts, _args = getopt.getopt(argv,"c:",["config="])
     except getopt.GetoptError:
-        print(colored("healthcheck -c <config>",'red'))
+        #print(colored("healthcheck -c <config>",'red'))
+        PrintMesg.main('HELP','healthcheck -c <config>','red')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-c", "--config"):
@@ -95,7 +98,8 @@ def main(argv):
     if health_check_config == "":
         health_check_config = "./examples/Healthcheck.yml"
     if os.path.isfile(health_check_config) is False:
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config of the health check proccess doesn't exist, please check "+health_check_config,'red'))
+        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config of the health check proccess doesn't exist, please check "+health_check_config,'red'))
+        PrintMesg.main('CRITICAL',"The config of the health check proccess doesn't exist, please check "+health_check_config,'red')
         sys.exit(2)
 
     config_process_load = open(health_check_config,'r')
@@ -154,7 +158,8 @@ def main(argv):
         else:
             default_max_history_data = config_process["config"]["default_max_history_data"]
 
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ LOAD ] - " + health_check_config,'green'))
+        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ LOAD ] - " + health_check_config,'green'))
+        PrintMesg.main('LOAD',health_check_config)
 
         try: 
             while True:
@@ -170,20 +175,25 @@ def main(argv):
                 
                 sleep(default_proccess_wait_time)
         except KeyboardInterrupt:
-            print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ STOPPING ] - The user has stopped the proccess",'yellow'))
+            # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [ STOPPING ] - The user has stopped the proccess",'yellow'))
+            PrintMesg.main('STOPPING','The user has stopped the proccess','yellow')
             sys.exit(0)
         except:
-            print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
+            # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
+            PrintMesg.main('UNKNOWN','Undefined error','grey')
             sys.exit(3)
 
     except (KeyError,TypeError) as _error:
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config file isn't valid: "+health_check_config,'red'))
+        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [CRITICAL] - The config file isn't valid: "+health_check_config,'red'))
+        PrintMesg.main('CRITICAL',"The config file isn't valid: "+health_check_config,'red')
         sys.exit(2)
     except:
-        print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
+        # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [UNKNOWN] - Undefined error: ",'grey'))
+        PrintMesg.main('UNKNOWN','Undefined error','grey')
         sys.exit(3)
 
 
 if __name__ == "__main__":
-    print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [STARTING] - The process is starting",'green'))
+    # print(colored("[ " + str(datetime.datetime.now()) + " ]", 'blue') + colored(" - [STARTING] - The process is starting",'green'))
+    PrintMesg.main('STARTED','The process is started')
     main(sys.argv[1:])

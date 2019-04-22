@@ -9,6 +9,7 @@
 # Import of the requirenments
 import yaml
 import os.path
+import modules.extras.ResolvName as ResolvName
 import modules.extras.PortOpen as PortOpen
 import modules.extras.CheckConfig as CheckConfig
 import platform
@@ -27,7 +28,7 @@ def main ( config_path = "examples/GoogleUrl.yml" ):
 
     with open(config_path, 'r') as yaml_stream:
         try:
-            httpgetstring = yaml.load(yaml_stream)
+            httpgetstring = yaml.safe_load(yaml_stream)
         except yaml.YAMLError as exc:
             print(exc)
     
@@ -57,6 +58,8 @@ def main ( config_path = "examples/GoogleUrl.yml" ):
             exit_value="UNKNOWN"
 
     #Check comunication with the services
+    if ResolvName.main(httpgetstring["http_conf"]["host"]) == False:
+        return("["+exit_value+"] - Can't resolve dns %s" % (httpgetstring["http_conf"]["host"]),exit_code)
     if PortOpen.main(httpgetstring["http_conf"]["host"],httpgetstring["http_conf"]["port"]) != 0:
         return("["+exit_value+"] - Host unreachable %s:%s" % (httpgetstring["http_conf"]["host"],httpgetstring["http_conf"]["port"]),exit_code)
 

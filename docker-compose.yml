@@ -1,0 +1,35 @@
+version: "3.2"
+services:
+  check:
+    build:
+      context: '.'
+    depends_on:
+      - db
+    networks:
+      - check
+      - backend
+    environment:
+      DB_NAME: "${DB_NAME}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_TABLE: "${DB_TABLE}"
+      DB_HOST: db-failed
+    container_name: check
+  db:
+    image: mysql:${MYSQL_VERSION:-latest}
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+            - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    container_name: db
+networks:
+  check:
+  backend:
