@@ -7,6 +7,7 @@ import datetime
 import threading
 import os
 import modules.extras.PrintMesg as PrintMesg
+
 from time import sleep
 from dateutil import parser 
 
@@ -18,7 +19,7 @@ class StepData (object):
         self.result_file = result_file
         self.lockfile = lockfile
         self.result_info = self.run()
-        self.execution_time = datetime.datetime.now()
+        self.execution_time = datetime.datetime.now().timestamp()
         self.history_changed_status = self.calculate_history_data()
         with open(result_file, 'w') as _outfile:
             yaml.dump(self.returninfo(), _outfile, default_flow_style=False)
@@ -81,8 +82,8 @@ def time_comparation(result_file,external_config):
             seconds_interval = external_config["seconds_interval"]
         result_file_load = open(result_file,'r')
         result_file_data = yaml.safe_load(result_file_load)
-        next_execution_time = result_file_data["execution_time"]+datetime.timedelta(seconds=seconds_interval)
-        if datetime.datetime.now() < next_execution_time:
+        next_execution_time = result_file_data["execution_time"]+seconds_interval
+        if datetime.datetime.now().timestamp() < next_execution_time:
             return False
     return True
 
@@ -189,5 +190,9 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    version = ".".join(map(str, sys.version_info[:2]))
+    if float(version) < 3.3:
+        PrintMesg.main('FAILED','The python version must be greater than 3.3','red')
+        sys.exit(2)
     PrintMesg.main('STARTED','The process is started')
     main(sys.argv[1:])

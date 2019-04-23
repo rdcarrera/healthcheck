@@ -10,7 +10,7 @@ config:
 tasks:
   - name: GoogleUrl
     module: HttpGetString
-    seconds_interval: 10
+    seconds_interval: 15
 #  - name: LocalMysql
 #    module: MysqlSelect
 #    seconds_interval: 10

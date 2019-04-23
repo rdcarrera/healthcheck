@@ -12,11 +12,7 @@ import os.path
 import modules.extras.ResolvName as ResolvName
 import modules.extras.PortOpen as PortOpen
 import modules.extras.CheckConfig as CheckConfig
-import platform
-if int(platform.python_version_tuple()[0]) < 3:
-    import urllib
-else: 
-    import urllib.request as urllib
+import urllib.request as urllib
 # Import the config model from the template
 from modules.templates.HttpGetString import config_template_require
 
