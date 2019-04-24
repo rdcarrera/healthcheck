@@ -4,11 +4,11 @@ conf:
   anomaly_exit: 2
 mysql_conf:
   port: 3306
-  host: "localhost"
-  database: "test"
-  user: "root"
-  password: "mypassword"
+  host: "DB_HOST"
+  database: "DB_NAME"
+  user: "DB_USERNAME"
+  password: "DB_PASSWORD"
   raise_on_warnings: True
 mysql_table:
-  table: "Persons"
+  table: "DB_TABLE"
   conditional: "WHERE TRUE"

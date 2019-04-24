@@ -11,6 +11,7 @@ import yaml
 import os.path
 import modules.extras.PortOpen as PortOpen
 import modules.extras.CheckConfig as CheckConfig
+import modules.extras.ResolvName as ResolvName
 import platform
 import mysql.connector
 # Import the config model from the template
@@ -24,7 +25,7 @@ def main ( config_path = "examples/LocalMysql.yml" ):
 
     with open(config_path, 'r') as yaml_stream:
         try:
-            mysqlSelect = yaml.load(yaml_stream)
+            mysqlSelect = yaml.safe_load(yaml_stream)
         except yaml.YAMLError as exc:
             print(exc)
 
@@ -54,6 +55,8 @@ def main ( config_path = "examples/LocalMysql.yml" ):
             exit_value="UNKNOWN"
 
     #Check comunication with the services
+    if ResolvName.main(mysqlSelect["mysql_conf"]["host"]) == False:
+        return("["+exit_value+"] - Can't resolve dns %s" % (mysqlSelect["mysql_conf"]["host"]),exit_code)
     if PortOpen.main(mysqlSelect["mysql_conf"]["host"],mysqlSelect["mysql_conf"]["port"]) != 0:
         return("["+exit_value+"] - Database unreachable %s:%s" % (mysqlSelect["mysql_conf"]["host"],mysqlSelect["mysql_conf"]["port"]),exit_code)
 

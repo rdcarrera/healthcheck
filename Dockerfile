@@ -1,53 +1,52 @@
 # HEALTHCHECK
-#
-# VERSION: develop
-
 FROM alpine:latest
-LABEL maintener "Ruben D. Carrera <@rdcarrera>"
-LABEL version develop
+
+LABEL maintener "Ruben D. Carrera <@rdcarrera>" \
+version "develop"
+
+
+#ENV with the path of the config
+ENV DOCKER_PATH="/healthcheck" \
+DOCKER_USER="workuser" \
+DOCKER_PORT="8080" \
+PS1="[HEALTHCHECK] - \w \$ " \
+TZ=Europe/Madrid
+
+ENV DOCKER_CONFIG="${DOCKER_PATH}/examples/Healthcheck.yml"
+
+#COPY Everything
+COPY ./docker-entrypoint.sh /usr/bin/
+COPY ./healthcheck ${DOCKER_PATH}/healthcheck
+COPY ./modules/ ${DOCKER_PATH}/modules/
+COPY ./examples/ ${DOCKER_PATH}/examples/
 
 #Install the python
-RUN apk add --update python3 
-
-#Update pip
-RUN python3 -m pip install --upgrade pip
-
-#Install pipenv
-RUN python3 -m pip install pipenv
-
-#Create the healthcheck
-RUN mkdir /healthcheck
-
-#ADD 777 perms to the healthcheck
-RUN chmod 777 /healthcheck
-
-#ADD work USER
-RUN adduser --system workuser
+RUN apk add --update python3 && \
+python3 -m pip install --upgrade pip && \
+python3 -m pip install pipenv && \
+mkdir -p ${DOCKER_PATH} && \
+chmod 777 ${DOCKER_PATH} && \
+adduser --system ${DOCKER_USER} && \
+chmod 777 /usr/bin/docker-entrypoint.sh && \
+chown -R ${DOCKER_USER} ${DOCKER_PATH}
 
 #Expose the port 8080
-#EXPOSE 8080
+#EXPOSE ${DOCKER_PORT}
 
 #User apache user
-USER workuser
+USER ${DOCKER_USER}
 
 #Move to the healthcheck
-WORKDIR /healthcheck
+WORKDIR ${DOCKER_PATH}
 
 #Install the dependency of the env
-RUN python3 -m pipenv install termcolor PyYAML python-dateutil
-
-#COPY EVERYTHING
-#COPY ./index.html /healthcheck/index.html
-COPY ./healthcheck /healthcheck/healthcheck
-COPY ./modules/ /healthcheck/modules/
-COPY ./examples/ /healthcheck/examples/
+RUN python3 -m pipenv install termcolor PyYAML python-dateutil mysql-connector-python-rf
 
 #Healthceck verification
 #HEALTHCHECK --interval=5m --timeout=3s \
 # CMD curl -f http://localhost:8080/ || exit 1
 
-#ENV with the path of the config
-ENV CONFIG_PATH /healthcheck/examples/Healthcheck.yml
+ENTRYPOINT [ "/usr/bin/docker-entrypoint.sh" ]
 
 #Execute the apache2
-CMD python3 -m pipenv run python /healthcheck/healthcheck -c  $CONFIG_PATH
+CMD [ "healthcheck" ]
