@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-import sys 
-import yaml 
+import sys
+import yaml
 import importlib
 import getopt
 import datetime
 import threading
 import os
 import modules.extras.PrintMesg as PrintMesg
-
 from time import sleep
-from dateutil import parser 
 
 class StepData (object):
     def __init__(self,module_name, config_name, result_file,lockfile):
@@ -27,7 +25,7 @@ class StepData (object):
             PrintMesg.main('END',config_name,'green',str(threading.current_thread().name))
         else:
             PrintMesg.main('FAIL',config_name+' : '+self.result_info[0],'red',str(threading.current_thread().name))
-        
+
         return None
 
     def run(self):
@@ -48,14 +46,14 @@ class StepData (object):
         return _module_info
 
     def returninfo(self):
-        return { 
-            'config_name': self.config_name, 
-            'module_name': self.module_name, 
-            'execution_time': self.execution_time, 
-            'result_info': 
-            [ 
+        return {
+            'config_name': self.config_name,
+            'module_name': self.module_name,
+            'execution_time': self.execution_time,
+            'result_info':
+            [
                 self.result_info[0],
-                self.result_info[1] 
+                self.result_info[1]
             ],
             'history_changed_status': self.history_changed_status
             }
@@ -64,9 +62,9 @@ class StepData (object):
         if os.path.isfile(self.result_file):
             _result_file_load = open(self.result_file,'r')
             _result_file_data = yaml.safe_load(_result_file_load)
-            _history_changed_status = _result_file_data["history_changed_status"] 
+            _history_changed_status = _result_file_data["history_changed_status"]
             if int(_history_changed_status[0].strip().split()[0]) is not self.result_info[1]:
-                _state_changed_data = str(self.result_info[1]) + " ||| " + str(self.execution_time) + " ||| " + self.result_info[0] 
+                _state_changed_data = str(self.result_info[1]) + " ||| " + str(self.execution_time) + " ||| " + self.result_info[0]
                 _history_changed_status.insert(0,_state_changed_data)
         else:
             _history_changed_status  = [ str(self.result_info[1]) + " ||| " + str(self.execution_time) + " ||| " + self.result_info[0] ]
@@ -122,7 +120,7 @@ def main(argv):
             default_history_folder = "./history/"
         else:
             default_history_folder = config_process["config"]["default_history_folder"]
-        
+
         if not os.path.exists(default_history_folder):
             os.makedirs(default_history_folder)
 
@@ -161,18 +159,18 @@ def main(argv):
 
         PrintMesg.main('LOAD',health_check_config)
 
-        try: 
+        try:
             while True:
 
                 for _iterator in range(len(config_process["tasks"])):
-            
+
                     result_file = default_history_folder+config_process["tasks"][_iterator]["name"]+".yml"
                     if time_comparation(result_file,config_process["tasks"][_iterator]) is False:
                         continue
                     lockfile = default_lock_folder+config_process["tasks"][_iterator]["name"]+".lck"
                     if os.path.isfile(lockfile) is False:
                         threading.Thread(target=StepData, args=(config_process["tasks"][_iterator]["module"],config_process["tasks"][_iterator]["name"],result_file,lockfile)).start()
-                
+
                 sleep(default_proccess_wait_time)
         except KeyboardInterrupt:
             PrintMesg.main('STOPPING','The user has stopped the proccess','yellow')
