@@ -1,0 +1,4 @@
+#!/bin/sh
+find ${WORKDIR_PATH}/modules/ -type f -name "*requirements" |while read requireFiles;do
+   python3 -m pipenv install -r ${requireFiles}
+done

@@ -9,16 +9,17 @@
 # Import of the requirenments
 import yaml
 import os.path
-import modules.extras.PortOpen as PortOpen
-import modules.extras.CheckConfig as CheckConfig
-import modules.extras.ResolvName as ResolvName
+import modules.HealthCheck.PortOpen as PortOpen
+import modules.HealthCheck.CheckConfig as CheckConfig
+import modules.HealthCheck.ResolvName as ResolvName
 import platform
 import mysql.connector
+from mysql.connector import Error
 # Import the config model from the template
-from modules.templates.MysqlSelect import config_template_require
+from modules.MysqlSelect.MysqlSelectTemplate import config_template_require
 
 
-def main ( config_path = "examples/LocalMysql.yml" ):
+def main ( config_path = "examples/checks/LocalMysql.yml" ):
     # Import of the configuration files
     if os.path.isfile(config_path) is False:
         return("[CRITICAL] - The config file doesn't exist, please check "+config_path,2)
@@ -63,24 +64,28 @@ def main ( config_path = "examples/LocalMysql.yml" ):
     # connect to the mysql
     try:
         mysql_connection = mysql.connector.connect(**mysqlSelect["mysql_conf"])
-        mysql_connection_cursor = mysql_connection.cursor(buffered=True)
-        if "mysql_table" in mysqlSelect:
-            if "table" not in mysqlSelect["mysql_table"] or "conditional" not in mysqlSelect["mysql_table"]:
-                 return("["+exit_value+"] - You doesn't have defined the table or conditional on mysql_table",exit_code)
-            if isinstance(mysqlSelect["mysql_table"]["table"], str) is False:
-                return("["+exit_value+"] - The table definition isn't valid: %s",mysqlSelect["mysql_table"]["table"],exit_code)
-            if isinstance(mysqlSelect["mysql_table"]["conditional"], str) is False:
-                return("["+exit_value+"] - The conditional definition isn't valid: %s",mysqlSelect["mysql_table"]["conditional"],exit_code)
-            mysql_query = ("SELECT * FROM "+mysqlSelect["mysql_table"]["table"]+" "+mysqlSelect["mysql_table"]["conditional"] )
-        else:
-            mysql_query = ("SELECT 1 + 1 FROM DUAL")
-        try:
-            mysql_connection_cursor.execute(mysql_query)
-            mysql_connection_cursor.close()
-            mysql_connection.close()
-        except:
-            return("["+exit_value+"] - The proccess can't execute the query %s" % (mysql_query),exit_code)
-    except:
+        if mysql_connection.is_connected():
+            if "mysql_table" in mysqlSelect:
+                if "table" not in mysqlSelect["mysql_table"] or "conditional" not in mysqlSelect["mysql_table"]:
+                    return("["+exit_value+"] - You doesn't have defined the table or conditional on mysql_table",exit_code)
+                if isinstance(mysqlSelect["mysql_table"]["table"], str) is False:
+                    return("["+exit_value+"] - The table definition isn't valid: %s",mysqlSelect["mysql_table"]["table"],exit_code)
+                if isinstance(mysqlSelect["mysql_table"]["conditional"], str) is False:
+                    return("["+exit_value+"] - The conditional definition isn't valid: %s",mysqlSelect["mysql_table"]["conditional"],exit_code)
+                mysql_query = ("SELECT * FROM "+mysqlSelect["mysql_table"]["table"]+" "+mysqlSelect["mysql_table"]["conditional"]+";" )
+            else:
+                mysql_query = ("SELECT 1 + 1 FROM DUAL;")
+            try:
+                mysql_connection_cursor = mysql_connection.cursor()
+                mysql_connection_cursor.execute(mysql_query)
+            except:
+                return("["+exit_value+"] - The proccess can't execute the query %s" % (mysql_query),exit_code)
+            finally:
+                if mysql_connection.is_connected():
+                    mysql_connection_cursor.close()
+                    mysql_connection.close()
+
+    except Error as e:
         return("["+exit_value+"] - The proccess can't connect to %s port %s database %s" % (mysqlSelect["mysql_conf"]["host"],mysqlSelect["mysql_conf"]["port"],mysqlSelect["mysql_conf"]["database"]),exit_code)
 
     #The correct exit

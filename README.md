@@ -13,6 +13,7 @@ Simple healthcheck service created in python
   * [Execution](#execution-)
   * [Config file](#config-file-)
   * [Modules](#modules-)
+* [SCREENSHOT](#screenshot-)
 * [VERSION History](#version-history-)
 * [Author](#author-)
 * [Mentions](#mentions-)
@@ -110,9 +111,11 @@ The time to wait in seconds between iteration to check this task
 
 - All the modules could have different configuration style (but everything in a yaml file)
 
+## SCREENSHOT [<img src="https://image.flaticon.com/icons/svg/23/23714.svg" alt="drawing" width="20"/>](#table)
+![screenshot](img/terminal.png)
 
 ## VERSION History [<img src="https://image.flaticon.com/icons/svg/23/23714.svg" alt="drawing" width="20"/>](#table)
-[VERSION History](https://github.com/rdcarrera/healthcheck/blob/develop/VERSION.md)
+[VERSION History](VERSION.md)
 
 ## Author [<img src="https://image.flaticon.com/icons/svg/23/23714.svg" alt="drawing" width="20"/>](#table)
 [<img src="https://avatars0.githubusercontent.com/u/26046280?s=460&v=4"/>](https://github.com/rdcarrera)

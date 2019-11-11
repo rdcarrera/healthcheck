@@ -9,15 +9,15 @@
 # Import of the requirenments
 import yaml
 import os.path
-import modules.extras.ResolvName as ResolvName
-import modules.extras.PortOpen as PortOpen
-import modules.extras.CheckConfig as CheckConfig
+import modules.HealthCheck.ResolvName as ResolvName
+import modules.HealthCheck.PortOpen as PortOpen
+import modules.HealthCheck.CheckConfig as CheckConfig
 import urllib.request as urllib
 # Import the config model from the template
-from modules.templates.HttpGetString import config_template_require
+from modules.HttpGetString.HttpGetStringTemplate import config_template_require
 
 
-def main ( config_path = "examples/GoogleUrl.yml" ):
+def main ( config_path = "examples/checks/GoogleUrl.yml" ):
     # Import of the configuration files
     if os.path.isfile(config_path) is False:
         return("[CRITICAL] - The config file doesn't exist, please check "+config_path,2)
